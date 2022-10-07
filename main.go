@@ -12,10 +12,11 @@ import (
 )
 
 type ProbeResult struct {
-	URL        string
-	StatusCode int
-	Body       []byte `json:"-"`
-	Error      error
+	URL              string
+	StatusCode       int
+	Body             []byte `json:"-"`
+	Error            error
+	ResponseTimeUsec int64
 }
 
 type Prober interface {
@@ -112,12 +113,14 @@ func (svc *ProbeService) probeURL(ctx context.Context, url string) ProbeResult {
 		return result
 	}
 
+	tstart := time.Now()
 	resp, err := svc.client.Do(req)
 	if err != nil {
 		result.Error = err
 		return result
 	}
 
+	result.ResponseTimeUsec = int64(time.Now().Sub(tstart) / time.Microsecond)
 	result.StatusCode = resp.StatusCode
 
 	defer resp.Body.Close()
