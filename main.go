@@ -35,6 +35,7 @@ func main() {
 		"https://stigok.com/",
 		"https://www.nrk.no/",
 		"https://stigok.com/not/found?q=3",
+		"http://localhost:8000/",
 	})
 
 	go func() {
