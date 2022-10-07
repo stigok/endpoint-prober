@@ -16,6 +16,7 @@ type ProbeResult struct {
 	StatusCode       int
 	Body             []byte `json:"-"`
 	Error            error
+	RequestEpochMsec int64
 	ResponseTimeUsec int64
 }
 
@@ -113,14 +114,16 @@ func (svc *ProbeService) probeURL(ctx context.Context, url string) ProbeResult {
 		return result
 	}
 
-	tstart := time.Now()
+	tStart := time.Now()
 	resp, err := svc.client.Do(req)
+	tEnd := time.Now()
 	if err != nil {
 		result.Error = err
 		return result
 	}
 
-	result.ResponseTimeUsec = int64(time.Now().Sub(tstart) / time.Microsecond)
+	result.ResponseTimeUsec = int64(tEnd.Sub(tStart) / time.Microsecond)
+	result.RequestEpochMsec = tStart.UnixMilli()
 	result.StatusCode = resp.StatusCode
 
 	defer resp.Body.Close()
